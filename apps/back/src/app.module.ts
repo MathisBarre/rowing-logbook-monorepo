@@ -9,7 +9,13 @@ import { RowersModule } from './rowers/rowers.module';
 import { ClubsModule } from './clubs/clubs.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), SessionsModule, BoatsModule, RowersModule, ClubsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    SessionsModule,
+    BoatsModule,
+    RowersModule,
+    ClubsModule,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
