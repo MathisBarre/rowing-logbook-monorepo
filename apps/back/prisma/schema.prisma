@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Rower {
+  id        Int                @id @default(autoincrement())
+  firstname String
+  lastname  String
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  sessions  RowersOnSessions[]
+  club      Club               @relation(fields: [clubId], references: [id])
+  clubId    Int
+
+  @@map("rowers")
+}
+
+model Session {
+  id                     Int                @id @default(autoincrement())
+  distance               Float?
+  estimatedStartDateTime DateTime?
+  estimatedEndDateTime   DateTime?
+  startDateTime          DateTime?
+  endDateTime            DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  rowers                 RowersOnSessions[]
+  boat                   Boat               @relation(fields: [boatId], references: [id])
+  route                  Route?             @relation(fields: [routeId], references: [id])
+  routeId                Int?
+  club                   Club               @relation(fields: [clubId], references: [id])
+  clubId                 Int
+  boatId                 Int
+
+  @@map("sessions")
+}
+
+model RowersOnSessions {
+  rower     Rower   @relation(fields: [rowerId], references: [id])
+  rowerId   Int
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId Int
+
+  @@id([rowerId, sessionId])
+  @@map("rowers_on_sessions")
+}
+
+model Boat {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
+  club      Club      @relation(fields: [clubId], references: [id])
+  clubId    Int
+
+  @@unique([clubId, name])
+  @@map("boats")
+}
+
+model Route {
+  id        Int       @id @default(autoincrement())
+  name      String
+  distance  Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
+  club      Club      @relation(fields: [clubId], references: [id])
+  clubId    Int
+
+  @@unique([clubId, name])
+  @@map("routes")
+}
+
+model Club {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  rowers    Rower[]
+  boats     Boat[]
+  routes    Route[]
+  sessions  Session[]
+
+  @@map("clubs")
+}
